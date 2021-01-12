@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="action_settings"
+        android:icon="@drawable/palette"
+        app:showAsAction="always">
+
+
+        <item
+            android:title="mint"
+            android:id = "@+id/theme_1"
+            app:showAsAction="never">
+        </item>
+
+        <item
+            android:title="orange"
+            android:id = "@+id/theme_2"
+            app:showAsAction="never">
+        </item>
+
+        <item
+            android:title="blue"
+            android:id = "@+id/theme_3"
+            app:showAsAction="never">
+        </item>
+
+        <item
+            android:title="black"
+            android:id = "@+id/theme_4"
+            app:showAsAction="never">
+        </item>
+
+        <item
+            android:title="red"
+            android:id = "@+id/theme_5"
+            app:showAsAction="never">
+        </item>
+
+    </item>
+
+</menu>
