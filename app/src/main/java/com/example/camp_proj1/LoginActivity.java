@@ -72,6 +72,9 @@ public class LoginActivity extends AppCompatActivity {
                                     try {
                                         UserID = object.getString("id");
                                         Log.v("Loginid", UserID);
+                                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                        intent.putExtra("UserID",UserID);
+                                        startActivity(intent);
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
@@ -106,20 +109,8 @@ public class LoginActivity extends AppCompatActivity {
             callbackManager.onActivityResult(requestCode, resultCode, data);
             super.onActivityResult(requestCode, resultCode, data);
 
-            Bundle b = new Bundle();
-            b.putString("UserID",UserID);
-
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            intent.putExtra("UserID",UserID);
-            startActivity(intent);
-            // App code
-
-            Fragment1 fragment1 = new Fragment1 ();
-            fragment1.setArguments(b);
-            Gallery gallery = new Gallery ();
-            Fragment3 fragment3 = new Fragment3();
-            fragment3.setArguments(b);
-            gallery.setArguments(b);
         }
+
+
 }
 

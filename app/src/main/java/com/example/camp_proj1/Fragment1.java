@@ -52,14 +52,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import static com.example.camp_proj1.AddNewUserInfo.added_data;
+
 public class Fragment1 extends Fragment {
     public String id = "abcdef";
     public ArrayList<UserInfo> data = new ArrayList<>();
+    public ArrayList<UserInfo> data1 = new ArrayList<>();
     private RecyclerViewAdapter adapter;
     RecyclerView recyclerView;
     public GetContactsTask gct;
     public String UserID;
     public static ArrayList data_deliver ;
+    public static String UserName,UserPhone;
 
     public Fragment1() {
         // Required empty public constructor
@@ -71,8 +75,14 @@ public class Fragment1 extends Fragment {
         UserID= LoginActivity.UserID;
 
 
+
+
+
         GetContactsTask gct = new GetContactsTask();
         gct.execute("http://192.249.18.251:8080/getContacts?id=");
+
+        GetMyInfo gct2 = new GetMyInfo();
+        gct2.execute("http://192.249.18.251:8080/getMyInfo?id=");
        // Log.v("aaaaaaaaaaaaa", UserID);
     }
 
@@ -142,6 +152,7 @@ public class Fragment1 extends Fragment {
 
             super.onPostExecute(result);
             resultlist = result;
+            /*
 
             Handler handler = new Handler();
             final Runnable r = new Runnable() {
@@ -151,6 +162,8 @@ public class Fragment1 extends Fragment {
             };
             handler.post(r);
 
+
+             */
             data = new ArrayList<>();
             try {
                 JSONArray jArray = new JSONArray(result);
@@ -160,6 +173,7 @@ public class Fragment1 extends Fragment {
                     UserInfo userInfo = new UserInfo(json_data.getString("name"),json_data.getString("phone"),json_data.getString("email"),R.drawable.basic2);
                     data.add(userInfo);
                 }
+
             } catch (JSONException e) {
                 Toast.makeText(getContext(), e.toString(), Toast.LENGTH_LONG).show();
             }
@@ -224,6 +238,78 @@ public class Fragment1 extends Fragment {
     }
 
  */
+
+    public class GetMyInfo extends AsyncTask<String, String, String>{
+        @Override
+        protected String doInBackground(String... values) {
+            try {
+                JSONObject jsonObject = new JSONObject();
+                //넘겨줄 정보
+                jsonObject.accumulate("id", LoginActivity.UserID);
+                HttpURLConnection con = null;
+                BufferedReader reader = null;
+                try{
+                    //연결할 URL
+                    URL url = new URL(values[0] + id);
+                    //URL url = new URL(urls[0]);
+                    //연결을 함
+                    con = (HttpURLConnection) url.openConnection();
+                    con.setRequestMethod("POST");//POST방식으로 보냄
+                    con.setRequestProperty("Cache-Control", "no-cache");//캐시 설정
+                    con.setRequestProperty("Content-Type", "application/json");
+                    con.setRequestProperty("Accept", "text/html");//서버에 response 데이터를 html로 받음
+                    con.setDoOutput(true);//Outstream으로 post 데이터를 넘겨주겠다는 의미
+                    con.setDoInput(true);//Inputstream으로 서버로부터 응답을 받겠다는 의미
+                    con.connect();
+                    //서버로 보내기위해서 스트림 만듬
+                    OutputStream outStream = con.getOutputStream();
+                    //버퍼를 생성하고 넣음
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outStream));
+                    writer.write(jsonObject.toString());
+                    writer.flush();
+                    writer.close();//버퍼를 받아줌
+                    //서버로 부터 데이터를 받음
+                    InputStream stream = con.getInputStream();
+                    reader = new BufferedReader(new InputStreamReader(stream));
+                    StringBuffer buffer = new StringBuffer();
+                    String line = "";
+                    while((line = reader.readLine()) != null){
+                        buffer.append(line);
+                    }
+                    return buffer.toString();//서버로 부터 받은 값을 리턴해줌 아마 OK!!가 들어올것임
+                } catch (MalformedURLException e){
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    if(con != null){
+                        con.disconnect();
+                    }
+                    try {
+                        if(reader != null){
+                            reader.close();//버퍼를 닫아줌
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(String result) {
+
+            super.onPostExecute(result);
+            try {
+                JSONArray jArray = new JSONArray(result);
+                JSONObject json_data = jArray.getJSONObject(0);
+                UserPhone = json_data.getString("phone");
+            } catch (JSONException e) {
+            }
+        }
+    }
 
     void refreshFragment(){
         FragmentTransaction ft = getFragmentManager().beginTransaction();

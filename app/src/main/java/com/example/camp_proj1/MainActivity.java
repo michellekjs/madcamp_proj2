@@ -8,7 +8,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -21,6 +23,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.TabHost;
 import android.widget.Toast;
 
@@ -64,6 +67,10 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
     private ArrayList<UserInfo> information = new ArrayList<>();
+    public String phonenumber;
+    public String name;
+    public String id = "abcdef";
+
 
 
 
@@ -95,14 +102,40 @@ public class MainActivity extends AppCompatActivity {
         Utils.onActivityCreateSetTheme(this);
         setContentView(R.layout.activity_main);
         Intent intent = getIntent();
-
         Context mContext = this.getApplicationContext();
 
-        if(CheckAppFirstExecute())
+
+
+        if(CheckAppFirstExecute()){
+
+            final EditText edittext = new EditText(this);
 
 
 
-        //if(CheckAppFirstExecute()) jsonParsing();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("전화번호 입력 동의");
+            builder.setMessage("어플리케이션의 정산 기능을 사용하기 위해서는 전화번호 입력이 필수입니다. 동의하시면 입력하고 어플을 실행합니다");
+            builder.setView(edittext);
+
+            builder.setPositiveButton("입력",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(getApplicationContext(),edittext.getText().toString() ,Toast.LENGTH_LONG).show();
+                            name = edittext.getText().toString();
+
+                            SetMyPhone gct = new SetMyPhone();
+                            gct.execute("http://192.249.18.251:8080/setMyPhone?id=");
+                        }
+                    });
+            builder.setNegativeButton("취소",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    });
+            builder.show();
+
+        }
 
 
         //TabLayout
@@ -125,16 +158,76 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-    }
-    public boolean getFirstRun() {
-        return mPrefs.getBoolean("firstRun", true);
     }
 
-    public void setRunned() {
-        SharedPreferences.Editor edit = mPrefs.edit();
-        edit.putBoolean("firstRun", false);
-        edit.commit();
+    public class SetMyPhone extends AsyncTask<String, String, String>{
+        @Override
+        protected String doInBackground(String... urls) {
+            try {
+                JSONObject jsonObject = new JSONObject();
+                //넘겨줄 정보
+                jsonObject.accumulate("id", LoginActivity.UserID);
+                jsonObject.accumulate("name", name);
+                jsonObject.accumulate("phonenumber", phonenumber);
+
+                HttpURLConnection con = null;
+                BufferedReader reader = null;
+                try{
+                    //연결할 URL
+                    URL url = new URL(urls[0] + id );
+                    //URL url = new URL(urls[0]);
+                    //연결을 함
+                    con = (HttpURLConnection) url.openConnection();
+                    con.setRequestMethod("POST");//POST방식으로 보냄
+                    con.setRequestProperty("Cache-Control", "no-cache");//캐시 설정
+                    con.setRequestProperty("Content-Type", "application/json");
+                    con.setRequestProperty("Accept", "text/html");//서버에 response 데이터를 html로 받음
+                    con.setDoOutput(true);//Outstream으로 post 데이터를 넘겨주겠다는 의미
+                    con.setDoInput(true);//Inputstream으로 서버로부터 응답을 받겠다는 의미
+                    con.connect();
+                    //서버로 보내기위해서 스트림 만듬
+                    OutputStream outStream = con.getOutputStream();
+                    //버퍼를 생성하고 넣음
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outStream));
+                    writer.write(jsonObject.toString());
+                    writer.flush();
+                    writer.close();//버퍼를 받아줌
+                    //서버로 부터 데이터를 받음
+                    InputStream stream = con.getInputStream();
+                    reader = new BufferedReader(new InputStreamReader(stream));
+                    StringBuffer buffer = new StringBuffer();
+                    String line = "";
+                    while((line = reader.readLine()) != null){
+                        buffer.append(line);
+                    }
+                    return buffer.toString();//서버로 부터 받은 값을 리턴해줌 아마 OK!!가 들어올것임
+                } catch (MalformedURLException e){
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    if(con != null){
+                        con.disconnect();
+                    }
+                    try {
+                        if(reader != null){
+                            reader.close();//버퍼를 닫아줌
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(String result) {
+
+            //tvData.setText(result);//서버로 부터 받은 값을 출력해주는 부
+        }
+
     }
 
 
@@ -156,5 +249,9 @@ public class MainActivity extends AppCompatActivity {
 
         return !isFirst;
     }
+
+
+
+
 
 }

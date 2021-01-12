@@ -283,12 +283,12 @@ public void onActivityResult(int requestCode, int resultCode, Intent data) {
         }
         //refresh fragment
         addImage();
-        refreshFragment();
     }
     else if(requestCode == PICK_FROM_CAMERA){
-        refreshFragment();
         addImage();
     }
+    refreshFragment();
+
 }
 
 private void addImage() {
@@ -482,6 +482,11 @@ public class GetImageTask extends AsyncTask<String, String, String> {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        //Log.i("images", mArrayList.get(0).path);
+        refreshFragment();
     }
+
+
 }
+
 }

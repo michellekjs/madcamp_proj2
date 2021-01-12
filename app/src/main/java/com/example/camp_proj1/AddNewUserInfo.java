@@ -19,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
 import java.util.Random;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -52,6 +53,7 @@ public class AddNewUserInfo extends AppCompatActivity {
     public String name;
     public String number;
     public String email;
+    public static UserInfo added_data;
 
     EditText nameText;
     EditText numberText;
@@ -92,6 +94,7 @@ public class AddNewUserInfo extends AppCompatActivity {
                     number = numberText.getText().toString();
                     email = emailText.getText().toString();
                     new AddContactTask().execute("http://192.249.18.251:8080/addContact?id=");//AsyncTask 시작시킴
+                    added_data = new UserInfo(name, number, email,R.drawable.basic2);
                 }
             });
 

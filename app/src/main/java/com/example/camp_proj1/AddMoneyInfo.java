@@ -7,6 +7,7 @@ import android.graphics.drawable.shapes.OvalShape;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -40,20 +41,13 @@ public class AddMoneyInfo extends AppCompatActivity {
 
 
     public String writer, date,money_total,account_address,participant_list;
-
     public ArrayList<String> participants;
-
     EditText ewriter,eparticipants, edate,emoney_total,eaccount_address;
-
     String id="abcdef";
-
-    public String [] items = {};
-
     public ArrayList<UserInfo> list = Fragment1.data_deliver;
-
     public ArrayList<String> participant_arraylist ;
-
-    public ArrayList<String> participant_number_list;
+    public ArrayList<String> participant_number_list = new ArrayList<>();
+    public String UserPhone = Fragment1.UserPhone;
 
 
     //public String UserID;
@@ -63,98 +57,18 @@ public class AddMoneyInfo extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        final List<String> selectedItems = new ArrayList<String>();
+        List<String> selectedItems = new ArrayList<String>();
 
 
         setContentView(R.layout.addmoneyinfo);
+
         Button savebutton = (Button) findViewById(R.id.save);
         Button cancelbutton = (Button) findViewById(R.id.cancel);
         Button participant_btn = (Button) findViewById(R.id.participant_select);
 
         //참가자들 선택하는 버튼 누르면 멀티셀렉 드롭다운 리스트 나오게 함
 
-        participant_btn.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v) {
-
-
-               //여기에는 친구 목록 불러와야됨
-               //datadeliver에 친구들 이름,이메일,폰번호 담겨있음. -> [{},{},{}]의 형태.
-               //public ArrayList<UserInfo> data = new ArrayList<>(); datadeliver는 fragment1dml data와 같은 애임! static 퍼블릭변수로 가져옴
-
-               //불러옴
-
-              for (int i=0; i<list.size();i++ ){
-                  items[i] = list.get(i).name;
-              }
-
-              //data에 있는 userinfo를 포문을 사용하여 전체 친구이름을 추출하고, 사용가능한형태로 다시 저장. 밑에 코드들에서 items 사용.
-
-              int s_length = items.length;
-              boolean[] array = new boolean[s_length];
-
-
-               //final String[] items = new String[]{"IT/Computer", "Game", "Fashion", "VR", "Kidult", "Sports", "Music", "Movie"};
-
-               //
-
-               AlertDialog.Builder dialog = new AlertDialog.Builder(AddMoneyInfo.this);
-               dialog.setTitle("Select the Participants")
-                       .setMultiChoiceItems(items,
-                               array,
-                               new DialogInterface.OnMultiChoiceClickListener() {
-                                   @Override
-                                   public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                                       if (isChecked) {
-                                           Toast.makeText(AddMoneyInfo.this, items[which], Toast.LENGTH_SHORT).show();
-                                           selectedItems.add(items[which]);
-                                       } else {
-                                           selectedItems.remove(items[which]);
-                                       }
-                                   }
-                               })
-
-                       .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
-                           @Override
-                           public void onClick(DialogInterface dialog, int which) {
-                               if (selectedItems.size() == 0) {
-                                   Toast.makeText(AddMoneyInfo.this, "You selected no one", Toast.LENGTH_SHORT).show();
-                               } else {
-                                   String items = "";
-                                   for (String selectedItem : selectedItems) {
-                                       items += (selectedItem + ", ");
-                                   }
-
-                                   //participant_list에 지금 추가한 친구들의 이름이 쭉 담겨 있음.
-
-                                   participant_list = items;
-
-                                   //초기화
-                                   selectedItems.clear();
-                                   items = items.substring(0, items.length() - 2);
-                                   Toast.makeText(AddMoneyInfo.this, items, Toast.LENGTH_SHORT).show();
-
-                               }
-
-                           }
-
-                       }).create().show();
-           }
-       });
-
-        participant_arraylist = new  ArrayList<String>(Arrays.asList(participant_list.split(",")));
-
-        for (int i=0; i<=participant_list.length();i++){
-            for (int j=0; j<=list.size();j++){
-                if (list.get(j).name == participant_arraylist.get(i) ){
-                    participant_number_list.add(list.get(j).phoneNumber);
-                }
-            }
-        }
-
         //participant_number_list 는 친구들의 전화번호 정보 담은 arraylist
-
-
 
         ewriter = findViewById(R.id.writer);
 
@@ -163,6 +77,90 @@ public class AddMoneyInfo extends AppCompatActivity {
         edate = findViewById(R.id.date);
         emoney_total = findViewById(R.id.money_total);
         eaccount_address = findViewById(R.id.account_address);
+        Log.v("taaaaaaaaaaa", "enntered??");
+
+
+
+        String [] items = new String[list.size()];
+
+        participant_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //여기에는 친구 목록 불러와야됨
+                //datadeliver에 친구들 이름,이메일,폰번호 담겨있음. -> [{},{},{}]의 형태.
+                //public ArrayList<UserInfo> data = new ArrayList<>(); datadeliver는 fragment1dml data와 같은 애임! static 퍼블릭변수로 가져옴
+
+                //불러옴
+
+                for (int i=0; i<list.size();i++ ){
+                    items[i] = list.get(i).name;
+                }
+
+                //data에 있는 userinfo를 포문을 사용하여 전체 친구이름을 추출하고, 사용가능한형태로 다시 저장. 밑에 코드들에서 items 사용.
+
+                int s_length = items.length;
+                boolean[] array = new boolean[s_length];
+
+
+                //final String[] items = new String[]{"IT/Computer", "Game", "Fashion", "VR", "Kidult", "Sports", "Music", "Movie"};
+
+                //
+
+                AlertDialog.Builder dialog = new AlertDialog.Builder(AddMoneyInfo.this);
+                dialog.setTitle("Select the Participants")
+                        .setMultiChoiceItems(items,
+                                array,
+                                new DialogInterface.OnMultiChoiceClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                                        if (isChecked) {
+                                            Toast.makeText(AddMoneyInfo.this, items[which], Toast.LENGTH_SHORT).show();
+                                            selectedItems.add(items[which]);
+                                        } else {
+                                            selectedItems.remove(items[which]);
+                                        }
+                                    }
+                                })
+
+                        .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (selectedItems.size() == 0) {
+                                    Toast.makeText(AddMoneyInfo.this, "You selected no one", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    String items = "";
+                                    for (String selectedItem : selectedItems) {
+                                        items += (selectedItem + ", ");
+                                    }
+
+                                    //participant_list에 지금 추가한 친구들의 이름이 쭉 담겨 있음.
+
+                                    participant_list = items;
+
+                                    //초기화
+                                    selectedItems.clear();
+                                    items = items.substring(0, items.length() - 2);
+                                    Toast.makeText(AddMoneyInfo.this, items, Toast.LENGTH_SHORT).show();
+
+                                    participant_arraylist = new ArrayList<String>(Arrays.asList(participant_list.split(", ")));
+
+
+                                    for (int i = 0; i < participant_arraylist.size(); i++) {
+                                        for (int j = 0; j < list.size(); j++) {
+                                            if (list.get(j).name.equals(participant_arraylist.get(i))) {
+                                                participant_number_list.add(list.get(j).phoneNumber);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+
+                        }).create().show();
+            }
+
+        });
 
 
 
@@ -170,17 +168,42 @@ public class AddMoneyInfo extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
 
-                    ArrayList<String> url = new ArrayList<>();
+                    ArrayList<String> url_arr = new ArrayList<>();
+                    ArrayList<String> parts_arr = new ArrayList<>();
+                    ArrayList<String> parts_id_arr = new ArrayList<>();
+                    ArrayList<String> writer_arr = new ArrayList<>();
+                    ArrayList<String> writer_id_arr = new ArrayList<>();
+                    ArrayList<String> date_arr = new ArrayList<>();
+                    ArrayList<String> money_arr = new ArrayList<>();
+                    ArrayList<String> account_arr = new ArrayList<>();
+                    url_arr.add("http://192.249.18.251:8080/addMoneyList?id=");
+                    //parts_arr.add("bb");
+                    //parts_id_arr.add("11");
+                    //해결해야되는 목록
 
+                    parts_arr = participant_arraylist;
+                    parts_id_arr = participant_number_list;
+                    writer_arr.add(ewriter.getText().toString());   //내 이름
+                    writer_id_arr.add(UserPhone);   //내 폰번호
 
-                    writer = ewriter.getText().toString();
-
-                    participants = participant_arraylist;
+                    //writer = ewriter.getText().toString();
                     date = edate.getText().toString();
                     money_total = emoney_total.getText().toString();
-                    account_address = eaccount_address.getText().toString();
-                   // url.add("http://192.249.18.248:8080/addMoneyList?id=");
-                    //new AddMoneyTask().execute(url, participants, participant_number_list);
+
+
+                    date_arr.add(date);
+                    money_arr.add(money_total);
+                    account_arr.add(account_address);
+                    new AddMoneyTask().execute(url_arr, parts_arr, parts_id_arr, writer_arr, writer_id_arr, date_arr, money_arr, account_arr);//AsyncTask 시작시킴
+
+
+
+
+
+                    participants = participant_arraylist;
+                    //account_address = eaccount_address.getText().toString();
+                    //url.add("http://192.249.18.248:8080/addMoneyList?id=");
+                    //new AddMoneyTask().execute(url_arr, participants, participant_number_list);
                     //new AddMoneyTask().execute("http://192.249.18.251:8080/addMoneyList?id=");//AsyncTask 시작시킴
                 }
             });
@@ -194,14 +217,15 @@ public class AddMoneyInfo extends AppCompatActivity {
     }
 
 
-    public String UserID = Profile.getCurrentProfile().getId();
+    //public String UserID = Profile.getCurrentProfile().getId();
     public class AddMoneyTask extends AsyncTask<ArrayList<String>, String, String>{
         @Override
         protected String doInBackground(ArrayList<String>... values) {
             try {
                 JSONObject jsonObject = new JSONObject();
                 //넘겨줄 정보
-                jsonObject.accumulate("writer", UserID);
+                jsonObject.accumulate("writer", values[3].get(0));
+                jsonObject.accumulate("writer_id", UserPhone);
                 jsonObject.accumulate("participants", participants);
                 jsonObject.accumulate("date",date);
                 jsonObject.accumulate("money", money_total);
@@ -212,7 +236,7 @@ public class AddMoneyInfo extends AppCompatActivity {
                 BufferedReader reader = null;
                 try{
                     //연결할 URL
-                    URL url = new URL(values[0] + id);
+                    URL url = new URL(values[0].get(0) + id);
                     //URL url = new URL(urls[0]);
                     //연결을 함
                     con = (HttpURLConnection) url.openConnection();

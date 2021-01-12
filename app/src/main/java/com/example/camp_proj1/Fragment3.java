@@ -24,9 +24,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.facebook.Profile;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -54,10 +56,14 @@ import org.w3c.dom.Text;
 public class Fragment3 extends Fragment {
     public String id = "abcdef";
     public String UserID;
-    public ArrayList<MoneyInfo> data = new ArrayList<>();
-    private RecyclerViewAdapter3 adapter;
     RecyclerView recyclerView;
     public GetMoneyTask gct;
+    public String UserPhone = Fragment1.UserPhone;
+    public static ArrayList<MoneyInfo> offData = new ArrayList<>();
+    public static ArrayList<MoneyInfo> onData = new ArrayList<>();
+    public RecyclerViewAdapter3 onAdapter;
+    public RecyclerViewAdapter3 offAdapter;
+    public ToggleButton toggle;
 
     public Fragment3() {
         // Required empty public constructor
@@ -66,10 +72,8 @@ public class Fragment3 extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //GetMoneyTask gct = new GetMoneyTask();
-        //gct.execute("http://192.249.18.251:8080/getMoney?id=");
-
-
+        GetMoneyTask gct = new GetMoneyTask();
+        gct.execute("http://192.249.18.251:8080/getMoney?id=");
     }
 
     public static String resultlist;
@@ -136,29 +140,51 @@ public class Fragment3 extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
-
-            super.onPostExecute(result);
-            Handler handler = new Handler();
-            final Runnable r = new Runnable() {
-                public void run() {
-                    adapter.notifyDataSetChanged();
-                }
-            };
-            handler.post(r);
-
-            data = new ArrayList<>();
+            super.onPostExecute(result);    //서버로 부터 받은 값을 출력해주는 부분
+            //Todo: 내용 완전 수정해줘야됨 -> money list 받아오는 부분
+            //data parsing 하기
+            //parts_id에 내 전화번호 있는지 확인 -> 있으면 그 object array에 넣어서 display
+            JSONArray jsonArray;
+            String writer;
+            String writer_id;
+            String parts_tmp;
+            String parts[];
+            String parts_id_tmp;
+            String parts_id[];
+            String date;
+            String money;
+            String account;
             try {
-                JSONArray jArray = new JSONArray(result);
-                // Extract data from json and store into ArrayList as class objects
-                for(int i=0;i<jArray.length();i++){
-                    JSONObject json_data = jArray.getJSONObject(i);
-                    System.out.println(json_data.get("participants"));
-                    MoneyInfo moneyInfo = new MoneyInfo(json_data.getString("writer"),(ArrayList) json_data.get("participants"),(ArrayList) json_data.get("parts_id"),
-                            json_data.getString("date"),json_data.getString("money"), json_data.getString("account"));
-                    data.add(moneyInfo);
+                jsonArray = new JSONArray(result);
+                for(int i = 0; i < jsonArray.length(); i++){
+                    JSONObject order = jsonArray.getJSONObject(i);
+                    writer = order.getString("writer");
+                    writer_id = order.getString("writer_id");
+                    parts_id_tmp = order.getString("parts_id");
+                    Log.i("Parts_ID: ", parts_id_tmp);
+
+                    parts_id = parts_id_tmp.substring(3, parts_id_tmp.length() - 3).split(", ");
+                    for(int j = 0; j < parts_id.length; j++){
+                        if(parts_id[j].equals(UserPhone) || writer_id.equals(UserPhone)){ //정보를 가져와야 하는 경우: (내가 참가자인 경우 || 내가 호스트인 경우)
+                            parts_tmp = order.getString("participants");
+                            parts = parts_tmp.substring(3, parts_tmp.length() - 3).split(", ");
+                            date = order.getString("date");
+                            money = order.getString("money");
+                            account = order.getString("account");
+                            Log.i("MyList: ", money);
+                            //money_tv.setText(writer);//서버로 부터 받은 값을 출력해주는 부분
+                            if(writer_id.equals(UserPhone)){ //내가 호스트인 경우
+                                offData.add(new MoneyInfo(writer, UserPhone, parts, parts_id, date, money, account));
+                            }
+                            else{   //내가 참여자인 경우
+                                onData.add(new MoneyInfo(writer, UserPhone, parts, parts_id, date, money, account));
+                            }
+                        }
+                    }
+
                 }
             } catch (JSONException e) {
-                Toast.makeText(getContext(), e.toString(), Toast.LENGTH_LONG).show();
+                e.printStackTrace();
             }
             refreshFragment();
         }
@@ -177,6 +203,8 @@ public class Fragment3 extends Fragment {
         recyclerView.setHasFixedSize(true);
         setHasOptionsMenu(true);
 
+        toggle = (ToggleButton) view.findViewById(R.id.host_toggle);
+
         FloatingActionButton fab2 = view.findViewById(R.id.fab2);
         fab2.setOnClickListener(new View.OnClickListener() {
             //@Override
@@ -191,22 +219,30 @@ public class Fragment3 extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new RecyclerViewAdapter3(context, data);
-        recyclerView.setAdapter(adapter);
+        offAdapter = new RecyclerViewAdapter3(context, offData);
+        recyclerView.setAdapter(offAdapter);
+
+ //toggle
+        toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton toggleButton, boolean isChecked) {
+                if(toggleButton.isChecked()){   //toggle ON
+                    onAdapter = new RecyclerViewAdapter3(context, onData);
+                    recyclerView.setAdapter(onAdapter);
+                }
+                else{   //toggle OFF
+                    offAdapter = new RecyclerViewAdapter3(context, offData);
+                    recyclerView.setAdapter(offAdapter);
+                }
+                refreshFragment();
+            }
+        });
 
 
         return view;
     }
 
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        adapter.notifyDataSetChanged();
-        recyclerView.setAdapter(adapter);
-
-
-    }
 
     void refreshFragment(){
         FragmentTransaction ft = getFragmentManager().beginTransaction();
