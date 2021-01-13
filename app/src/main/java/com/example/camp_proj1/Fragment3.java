@@ -65,6 +65,7 @@ public class Fragment3 extends Fragment {
     public RecyclerViewAdapter3 offAdapter;
     public ToggleButton toggle;
 
+
     public Fragment3() {
         // Required empty public constructor
     }
@@ -74,6 +75,7 @@ public class Fragment3 extends Fragment {
         super.onCreate(savedInstanceState);
         GetMoneyTask gct = new GetMoneyTask();
         gct.execute("http://192.249.18.251:8080/getMoney?id=");
+        Log.i("aaaaaaaaaaaaa", UserPhone);
     }
 
     public static String resultlist;
@@ -163,25 +165,25 @@ public class Fragment3 extends Fragment {
                     parts_id_tmp = order.getString("parts_id");
                     Log.i("Parts_ID: ", parts_id_tmp);
 
+
                     parts_id = parts_id_tmp.substring(3, parts_id_tmp.length() - 3).split(", ");
                     for(int j = 0; j < parts_id.length; j++){
                         if(parts_id[j].equals(UserPhone) || writer_id.equals(UserPhone)){ //정보를 가져와야 하는 경우: (내가 참가자인 경우 || 내가 호스트인 경우)
                             parts_tmp = order.getString("participants");
-                            parts = parts_tmp.substring(3, parts_tmp.length() - 3).split(", ");
+                            String parts_test = parts_tmp.substring(2, parts_tmp.length() - 2);
                             date = order.getString("date");
                             money = order.getString("money");
                             account = order.getString("account");
                             Log.i("MyList: ", money);
                             //money_tv.setText(writer);//서버로 부터 받은 값을 출력해주는 부분
                             if(writer_id.equals(UserPhone)){ //내가 호스트인 경우
-                                offData.add(new MoneyInfo(writer, UserPhone, parts, parts_id, date, money, account));
+                                offData.add(new MoneyInfo(writer, UserPhone, parts_test, parts_id, date, money, account));
                             }
                             else{   //내가 참여자인 경우
-                                onData.add(new MoneyInfo(writer, UserPhone, parts, parts_id, date, money, account));
+                                onData.add(new MoneyInfo(writer, UserPhone, parts_test, parts_id, date, money, account));
                             }
                         }
                     }
-
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -221,7 +223,6 @@ public class Fragment3 extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         offAdapter = new RecyclerViewAdapter3(context, offData);
         recyclerView.setAdapter(offAdapter);
-
  //toggle
         toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -231,7 +232,7 @@ public class Fragment3 extends Fragment {
                     recyclerView.setAdapter(onAdapter);
                 }
                 else{   //toggle OFF
-                    offAdapter = new RecyclerViewAdapter3(context, offData);
+                    offAdapter = new RecyclerViewAdapter3(context, onData);
                     recyclerView.setAdapter(offAdapter);
                 }
                 refreshFragment();

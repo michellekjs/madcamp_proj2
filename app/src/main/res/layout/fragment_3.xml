@@ -10,8 +10,8 @@
         android:id="@+id/host_toggle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textOff="참가자"
-        android:textOn="주최자"
+        android:textOff="주최자"
+        android:textOn="참가자"
         android:layout_marginLeft="300dp"
         android:backgroundTint="@color/pink"/>
     <androidx.recyclerview.widget.RecyclerView

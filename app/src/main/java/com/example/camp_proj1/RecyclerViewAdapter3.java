@@ -59,7 +59,7 @@ public class RecyclerViewAdapter3 extends RecyclerView.Adapter<RecyclerViewAdapt
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewAdapter3.MyViewHolder holder, int position) {
         holder.writer.setText(mPersons.get(position).writer);
-        holder.participants.setText(mPersons.get(position).participants.toString());
+        holder.participants.setText(mPersons.get(position).participants);
         holder.date.setText(mPersons.get(position).date);
         holder.money.setText(mPersons.get(position).money);
         holder.account.setText(mPersons.get(position).account);

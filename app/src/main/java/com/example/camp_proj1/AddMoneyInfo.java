@@ -186,9 +186,12 @@ public class AddMoneyInfo extends AppCompatActivity {
                     writer_arr.add(ewriter.getText().toString());   //내 이름
                     writer_id_arr.add(UserPhone);   //내 폰번호
 
+                    Log.i("aaaaaaaaaaaaa", UserPhone);
+
                     //writer = ewriter.getText().toString();
                     date = edate.getText().toString();
                     money_total = emoney_total.getText().toString();
+                    account_address = eaccount_address.getText().toString();
 
 
                     date_arr.add(date);
@@ -201,7 +204,7 @@ public class AddMoneyInfo extends AppCompatActivity {
 
 
                     participants = participant_arraylist;
-                    //account_address = eaccount_address.getText().toString();
+
                     //url.add("http://192.249.18.248:8080/addMoneyList?id=");
                     //new AddMoneyTask().execute(url_arr, participants, participant_number_list);
                     //new AddMoneyTask().execute("http://192.249.18.251:8080/addMoneyList?id=");//AsyncTask 시작시킴
@@ -287,7 +290,9 @@ public class AddMoneyInfo extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
+
         }
     }
+
 
 }

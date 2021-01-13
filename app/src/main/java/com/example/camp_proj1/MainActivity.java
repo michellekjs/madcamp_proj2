@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             Toast.makeText(getApplicationContext(),edittext.getText().toString() ,Toast.LENGTH_LONG).show();
-                            name = edittext.getText().toString();
+                            phonenumber = edittext.getText().toString();
 
                             SetMyPhone gct = new SetMyPhone();
                             gct.execute("http://192.249.18.251:8080/setMyPhone?id=");
@@ -167,7 +167,6 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject jsonObject = new JSONObject();
                 //넘겨줄 정보
                 jsonObject.accumulate("id", LoginActivity.UserID);
-                jsonObject.accumulate("name", name);
                 jsonObject.accumulate("phonenumber", phonenumber);
 
                 HttpURLConnection con = null;

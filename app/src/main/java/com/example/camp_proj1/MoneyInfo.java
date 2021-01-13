@@ -6,9 +6,10 @@ import java.util.ArrayList;
 public class MoneyInfo {
 
     String writer, date, money, account, writer_id;
-    String[]  participants,participants_number;
+    String[] participants_number;
+    String participants;
 
-    public MoneyInfo(String writer, String writer_id, String[] participants, String[] participants_number, String date, String money, String account){
+    public MoneyInfo(String writer, String writer_id, String participants, String[] participants_number, String date, String money, String account){
         this.writer = writer;
         this.participants  = participants;
         this.date= date;
@@ -23,7 +24,7 @@ public class MoneyInfo {
         return writer;
     }
 
-    public String[] getParticipants(){return participants; }
+    public String getParticipants(){return participants; }
 
     public String[] getParticipants_number(){return participants_number;}
 

@@ -100,7 +100,7 @@ public void onCreate(Bundle savedInstanceState){
     UserID = LoginActivity.UserID;
     GetImageTask gct = new GetImageTask();
     //mArrayList = new ArrayList<>();
-    gct.execute("http://192.249.18.251:8080/getImages?id=");
+   // gct.execute("http://192.249.18.251:8080/getImages?id=");
 }
 
 @Override
@@ -305,7 +305,7 @@ private void addImage() {
     String profileImageBase64 = Base64.encodeToString(image, 0);
     String data = profileImageBase64;
 
-    new UploadImageTask().execute("http://192.249.18.251:8080/uploadImage?id=", data);//AsyncTask 시작시킴
+    //new UploadImageTask().execute("http://192.249.18.251:8080/uploadImage?id=", data);//AsyncTask 시작시킴
     mArrayList.add(new Picture(data));
 
 }
